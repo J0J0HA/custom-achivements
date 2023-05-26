@@ -1,6 +1,6 @@
 *.pyc
 **/__pycache__
 .vscode
-mount/db.sqlite3
 run.sh
 run.bat
+config/db.sqlite3
