@@ -30,14 +30,13 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-ALLOWED_HOSTS = [
-    "localhost"
-]
-
-with open(BASE_DIR / ".." / "config" / "allowed_hosts.txt", "r", encoding="ascii") as file:
+with open(BASE_DIR / ".." / "config" / "trustd_origins.txt", "r", encoding="ascii") as file:
     CSRF_TRUSTED_ORIGINS = ["localhost", *[name for name in file.read().split("\n") if name]]
     CSRF_TRUSTED_ORIGINS = ["https://" + name for name in CSRF_TRUSTED_ORIGINS] + ["http://" + name for name in CSRF_TRUSTED_ORIGINS]
-    print(CSRF_TRUSTED_ORIGINS)
+
+with open(BASE_DIR / ".." / "config" / "allowed_hosts.txt", "r", encoding="ascii") as file:
+    ALLOWED_HOSTS = ["localhost", *[name for name in file.read().split("\n") if name]]
+
 
 
 # Application definition
