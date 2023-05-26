@@ -1,0 +1,3 @@
+*.pyc
+.vscode
+src/db.sqlite3
