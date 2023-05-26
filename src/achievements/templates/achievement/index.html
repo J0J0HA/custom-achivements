@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Achievement | {{ username }}
+{% endblock %}
+
+{% block content %}
+<h1>{{ username }}'s Achievements</h1>
+{% if achievements %}
+<b class="subtitle">has the following Achivements:</b>
+<ul class="achievement-list">
+    {% for achievement in achievements %}
+    <li class="achievement-item">
+        <h3 class="achievement-title">{{ achievement.achievement.row.name }}, lvl {{ achievement.achievement.level }}</h3>
+        <p class="achievement-time">{{ achievement.date }}</p>
+        <p class="achievement-description">{{ achievement.achievement.description }}</p>
+        <p class="users-same-achievement">{{ achievement.achievement.achievementobsession_set.count }} user{{ achievement.achievement.achievementobsession_set|pluralize }} got this achievement.</p>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<b class="subtitle">has no achievements yet.</b>
+{% endif %}
+{% endblock %}
