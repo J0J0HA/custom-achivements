@@ -44,6 +44,7 @@ achievement_orders = {
     ),
 }
 
+
 def get_stats(request, username):
     requested_order = request.GET.get("order", "date")
     selected_order = achievement_orders.get(requested_order, "date")
@@ -52,6 +53,7 @@ def get_stats(request, username):
     ).order_by(*selected_order)
     return achievements
 
+
 def render_stats(request, username):
     achievements = get_stats(request, username)
     return render(
@@ -59,24 +61,37 @@ def render_stats(request, username):
         "achievement/index.html",
         {"username": username, "achievements": achievements},
     )
-    
+
+
 def json_stats(request, username):
     achievements = get_stats(request, username)
-    return HttpResponse(json.dumps({
-        "username": username,
-        "achievements": [
+    return HttpResponse(
+        json.dumps(
             {
-                "name": achievement.achievement.row.name,
-                "level": achievement.achievement.level,
-                "description": achievement.achievement.description,
-                "user_count": achievement.achievement.achievementobsession_set.count(),
-            } for achievement in achievements
-        ]
-    }), content_type="application/json")
+                "username": username,
+                "achievements": [
+                    {
+                        "name": achievement.achievement.row.name,
+                        "level": achievement.achievement.level,
+                        "description": achievement.achievement.description,
+                        "user_count": achievement.achievement.achievementobsession_set.count(),
+                    }
+                    for achievement in achievements
+                ],
+            }
+        ),
+        content_type="application/json",
+    )
+
 
 @login_required(login_url="/login")
 def index(request):
     return render_stats(request, request.user.username)
+
+
+@login_required(login_url="/login")
+def index_api(request):
+    return json_stats(request, request.user.username)
 
 
 def user(request, username):
