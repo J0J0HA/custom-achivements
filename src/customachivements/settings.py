@@ -25,7 +25,19 @@ SECRET_KEY = "django-insecure-bkqxrbe=x)uh%g8u__^*o!s7*rs#ouu%80b3825y!kk-67uh8o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+ALLOWED_HOSTS = [
+    "localhost"
+]
+
+with open(BASE_DIR / ".." / "config" / "allowed_hosts.txt", "r", encoding="ascii") as file:
+    CSRF_TRUSTED_ORIGINS = ["localhost", *[name for name in file.read().split("\n") if name]]
+    CSRF_TRUSTED_ORIGINS = ["https://" + name for name in CSRF_TRUSTED_ORIGINS] + ["http://" + name for name in CSRF_TRUSTED_ORIGINS]
+    print(CSRF_TRUSTED_ORIGINS)
 
 
 # Application definition
@@ -77,7 +89,7 @@ WSGI_APPLICATION = "customachivements.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / ".." / "mount" / "db.sqlite3",
+        "NAME": BASE_DIR / ".." / "config" / "db.sqlite3",
     }
 }
 
