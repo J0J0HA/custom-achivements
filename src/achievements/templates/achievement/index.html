@@ -22,4 +22,22 @@
 {% else %}
 <b class="subtitle">has no achievements yet.</b>
 {% endif %}
+
+<script>
+    const socket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/user/{{ username }}'
+    );
+
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log(data)
+    };
+
+    socket.onclose = function(e) {
+        console.error('Socket closed unexpectedly');
+    };
+</script>
+
 {% endblock %}

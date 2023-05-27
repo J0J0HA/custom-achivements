@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 
-from .models import AchievementObsession
+from .models import UserProfile
 
 
 User = get_user_model()
@@ -48,9 +48,8 @@ achievement_orders = {
 def get_stats(request, username):
     requested_order = request.GET.get("order", "date")
     selected_order = achievement_orders.get(requested_order, "date")
-    achievements = AchievementObsession.objects.filter(
-        user__exact=get_object_or_404(User, username=username)
-    ).order_by(*selected_order)
+    profile = get_object_or_404(UserProfile, user__username=username)
+    achievements = profile.achievements.order_by(*selected_order)
     return achievements
 
 

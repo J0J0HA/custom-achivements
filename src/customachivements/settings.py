@@ -37,12 +37,16 @@ with open(BASE_DIR / ".." / "config" / "trusted_origins.txt", "r", encoding="asc
 with open(BASE_DIR / ".." / "config" / "allowed_hosts.txt", "r", encoding="ascii") as file:
     ALLOWED_HOSTS = ["localhost", *[name for name in file.read().split("\n") if name]]
 
-
+CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_WHITELIST = ()
 
 # Application definition
 
 INSTALLED_APPS = [
     "achievements.apps.AchievementsConfig",
+    "daphne",
+    "channels",
+    'corsheaders',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -54,6 +58,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -80,7 +85,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "customachivements.wsgi.application"
-
+ASGI_APPLICATION = "customachivements.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
