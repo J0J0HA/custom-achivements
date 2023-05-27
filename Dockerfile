@@ -9,6 +9,7 @@ VOLUME /config
 COPY src /src
 COPY run.sh run.sh
 WORKDIR /src
+RUN python manage.py makemigrations achievements
 RUN python manage.py migrate
 RUN python regenerate.py
 ENV DJANGO_SUPERUSER_USERNAME=admin
