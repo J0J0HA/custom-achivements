@@ -4,6 +4,8 @@ Readmes are overrated, at least if you know how the program works.
 
 ## Install
 
+YOu need to clone the repo first.
+
 ### Manual
 
 #### Linux
