@@ -44,7 +44,7 @@ class AchievementObsession(models.Model):
 
 
 class UserProfile(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     stats = models.JSONField(null=True, blank=True, default=dict)
     achievements = models.ManyToManyField(AchievementObsession, blank=True)
 
