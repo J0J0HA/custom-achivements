@@ -1,6 +1,4 @@
-*.pyc
-**/__pycache__
 .vscode
-run.sh
-run.bat
-config/db.sqlite3
+**/db.sqlite3
+**/migrations
+**/__pycache__
