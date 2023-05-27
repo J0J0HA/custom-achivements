@@ -7,10 +7,13 @@ RUN python -m pip install -r requirements.txt
 COPY config /config
 VOLUME /config
 COPY src /src
+COPY run.sh run.sh
 WORKDIR /src
 RUN python manage.py migrate
+RUN python regenerate.py
 ENV DJANGO_SUPERUSER_USERNAME=admin
 ENV DJANGO_SUPERUSER_PASSWORD=admin
 ENV DJANGO_SUPERUSER_EMAIL=admin@example.com
 RUN python manage.py createsuperuser --noinput
-CMD [ "python", "manage.py", "runserver", "0.0.0.0:8055"]
+WORKDIR /
+CMD [ "sh", "run.sh" ]
