@@ -1,4 +1,12 @@
+if __name__ == "__main__":
+    import os
+    os.environ["DJANGO_SETTINGS_MODULE"] = "customachivements.settings"
+    import django
+    django.setup()
+    
+
 import regenerate_utils as rutils
+
 
 
 date_backup = rutils.backup_dates()

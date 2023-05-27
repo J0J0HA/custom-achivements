@@ -1,9 +1,3 @@
-import os, django, manage, json
-
-os.environ["DJANGO_SETTINGS_MODULE"] = "customachivements.settings"
-
-django.setup()
-
 from achievements.models import (
     AchievementRow,
     Achievement,
