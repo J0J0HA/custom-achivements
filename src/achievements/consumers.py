@@ -38,7 +38,6 @@ class StatsStreamConsumer(WebsocketConsumer):
             user.save()
 
         for trigger in Trigger.objects.filter(name=stat_name):
-            print(trigger, dir(trigger))
             if not trigger.is_triggered(user):
                 continue
             for achievement in trigger.achievement_set.all():
