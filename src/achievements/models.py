@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from datetime import datetime
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -34,7 +34,7 @@ class Achievement(models.Model):
 
 
 class AchievementObsession(models.Model):
-    date = models.DateTimeField(default=datetime.now)
+    date = models.DateTimeField(default=timezone.now)
     achievement = models.ForeignKey(Achievement, on_delete=models.CASCADE)
 
     def __str__(self):
