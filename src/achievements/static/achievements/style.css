@@ -49,6 +49,8 @@ main h1 {
 
 .achievement-item {
     flex-grow: 1;
+    flex-shrink: 0;
+    height: 100%;
     list-style: none;
     display: flex;
     flex-direction: column;
@@ -76,10 +78,16 @@ main h1 {
 }
 
 .achievement-item .achievement-description {
+    flex-grow: 0;
+    flex-shrink: 0;
     background-color: lightgrey;
     padding: 10px;
     border-radius: 5px;
-    max-width: 200px;
+    max-width: 250px;
+    min-width: 150px;
+    height: 2.7em;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .achievement-item .users-same-achievement {
