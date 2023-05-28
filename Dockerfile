@@ -7,4 +7,4 @@ RUN python -m pip install -r requirements.txt
 VOLUME /config
 COPY src /src
 WORKDIR /src
-ENTRYPOINT [ "python", "manage.py", "runserver", "0.0.0.0:80" ]
+CMD [ "python", "manage.py", "runserver", "0.0.0.0:80" ]
