@@ -23,6 +23,7 @@
 <b class="subtitle">has no achievements yet.</b>
 {% endif %}
 
+{% comment %}
 <script>
     const socket = new WebSocket(
         'ws://'
@@ -39,5 +40,6 @@
         console.error('Socket closed unexpectedly');
     };
 </script>
+{% endcomment %}
 
 {% endblock %}
