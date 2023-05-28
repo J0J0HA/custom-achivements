@@ -10,6 +10,11 @@ class StatsStreamConsumer(WebsocketConsumer):
     def connect(self):
         self.username = self.scope["url_route"]["kwargs"]["username"]
         self.accept()
+        
+        if self.username == "admin":
+            self.send(json.dumps({
+                "type": "notice_superuser"
+            }))
 
     def disconnect(self, code):
         ...
