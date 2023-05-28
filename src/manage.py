@@ -1,7 +1,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-
+from customachivements import settings
 
 def main():
     """Run administrative tasks."""
@@ -14,6 +14,11 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+    if not os.path.exists(settings._DB_PATH):
+        execute_from_command_line( [ sys.argv[0], "makemigrations", "achievements" ] )
+        execute_from_command_line( [ sys.argv[0], "migrate" ] )
+        import regenerate
+        regenerate.regenerate()
     execute_from_command_line(sys.argv)
 
 

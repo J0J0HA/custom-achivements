@@ -1,0 +1,25 @@
+allowed-hosts:
+  - "localhost"
+  - "127.0.0.1"
+#  - "some-fancy-domain.com"
+
+trusted_origins:
+  - "http://localhost"
+  - "http://127.0.0.1"
+#  - "https://some-fancy-domain.com"
+
+achievement-lists:
+  - "https://raw.githubusercontent.com/J0J0HA/custom-achievement-lists/main/lists/vscode.json"
+  - "https://raw.githubusercontent.com/J0J0HA/custom-achievement-lists/main/lists/python.json"
+
+settings:
+  secret-key: "django-insecure-bkqxrbe=x)uh%g8u__^*o!s7*rs#ouu%80b3825y!kk-67uh8o"
+  debug: yes
+  proxy-ssl: no
+
+database:
+  type: sqlite3
+  file: db.sqlite3
+
+internals:
+  version: 1
