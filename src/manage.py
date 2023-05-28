@@ -20,11 +20,11 @@ def main():
         execute_from_command_line( [ sys.argv[0], "migrate" ] )
         import regenerate
         regenerate.regenerate()
-    if not settings._SUPERUSER_CREATED:
-        execute_from_command_line( [ sys.argv[0], "createsuperuser", "--noinput" ] )
-        settings._CONFIG["internals"]["superuser-created"] = True
-        with open(settings._CONFIG_PATH, "w", encoding="ascii") as file:
-            yaml.dump(settings._CONFIG, file, Loader=yaml.Loader)
+    
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    if User.objects.all().count() == 0:
+        User.objects.create_superuser(username="admin", password="admin")
     execute_from_command_line(sys.argv)
 
 

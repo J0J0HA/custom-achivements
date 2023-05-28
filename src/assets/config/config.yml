@@ -3,7 +3,7 @@ allowed-hosts:
   - "127.0.0.1"
 #  - "some-fancy-domain.com"
 
-trusted_origins:
+trusted-origins:
   - "http://localhost"
   - "http://127.0.0.1"
 #  - "https://some-fancy-domain.com"
@@ -23,4 +23,3 @@ database:
 
 internals:
   version: 1
-  superuser-created: false
