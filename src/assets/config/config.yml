@@ -9,8 +9,7 @@ trusted-origins:
 #  - "https://some-fancy-domain.com"
 
 achievement-lists:
-  - "https://raw.githubusercontent.com/J0J0HA/custom-achievement-lists/main/lists/vscode.json"
-  - "https://raw.githubusercontent.com/J0J0HA/custom-achievement-lists/main/lists/python.json"
+  - "https://raw.githubusercontent.com/J0J0HA/custom-achievement-lists/main/all.json"
 
 settings:
   secret-key: "django-insecure-bkqxrbe=x)uh%g8u__^*o!s7*rs#ouu%80b3825y!kk-67uh8o"

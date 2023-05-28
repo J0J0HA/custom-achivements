@@ -2,3 +2,4 @@ Django
 channels[daphne]
 django-cors-headers
 pyyaml
+requests

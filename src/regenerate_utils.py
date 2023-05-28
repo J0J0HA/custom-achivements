@@ -33,14 +33,6 @@ def reindex(date_backup):
             if not achievement.trigger.is_triggered(user):
                 continue
             print(f"Adding Achievement '{achievement}' to {user}...")
-            print(date_backup.get(
-                user.user.username
-                + "$"
-                + achievement.row.name
-                + "$"
-                + str(achievement.level),
-                0,
-            ))
             obsession = AchievementObsession.objects.create(
                 date=date_backup.get(
                     user.user.username
@@ -80,16 +72,16 @@ def new_achievement(row, level, description, trigger):
     return achievement
 
 
-def achievements_from_list_manual(row, map):
-    for index, item in enumerate(map):
-        new_achievement(row=row, level=index, description=map[0], trigger=map[1])
+# def achievements_from_list_manual(row, map):
+#     for index, item in enumerate(map):
+#         new_achievement(row=row, level=index, description=map[0], trigger=map[1])
 
 
-def achievements_from_list_templated(row, nums, description, trigger_name):
-    for index, num in enumerate(nums):
-        new_achievement(
-            row=row,
-            level=index + 1,
-            description=description % num,
-            trigger=new_trigger(trigger_name, num),
-        )
+# def achievements_from_list_templated(row, nums, description, trigger_name):
+#     for index, num in enumerate(nums):
+#         new_achievement(
+#             row=row,
+#             level=index + 1,
+#             description=description % num,
+#             trigger=new_trigger(trigger_name, num),
+#         )

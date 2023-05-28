@@ -18,8 +18,9 @@ def main():
     if not os.path.exists(settings._DB_PATH):
         execute_from_command_line( [ sys.argv[0], "makemigrations", "achievements" ] )
         execute_from_command_line( [ sys.argv[0], "migrate" ] )
-        import regenerate
-        regenerate.regenerate()
+    import regenerate
+    regenerate.ensure_django()
+    regenerate.regenerate(settings._CONFIG.get("achievement-lists", []))
     execute_from_command_line(sys.argv)
 
 
