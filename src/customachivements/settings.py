@@ -17,7 +17,7 @@ with open(_CONFIG_PATH, "r", encoding="ascii") as file:
 _SETTINGS = _CONFIG.get("settings", {})
 
 _INTERNALS = _CONFIG.get("internals", {})
-_SUPERUSER_CREATED = _INTERNALS.get("superuser-created", False)
+_SUPERUSER_CREATED = _INTERNALS.get("superuser-created", True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/

@@ -1,6 +1,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+import yaml
 from customachivements import settings
 
 def main():
@@ -21,6 +22,9 @@ def main():
         regenerate.regenerate()
     if not settings._SUPERUSER_CREATED:
         execute_from_command_line( [ sys.argv[0], "createsuperuser", "--noinput" ] )
+        settings._CONFIG["internals"]["superuser-created"] = True
+        with open(settings._CONFIG_PATH, "w", encoding="ascii") as file:
+            yaml.dump(settings._CONFIG, file, Loader=yaml.Loader)
     execute_from_command_line(sys.argv)
 
 
