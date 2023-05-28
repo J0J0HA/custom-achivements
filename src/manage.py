@@ -20,11 +20,6 @@ def main():
         execute_from_command_line( [ sys.argv[0], "migrate" ] )
         import regenerate
         regenerate.regenerate()
-    
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-    if User.objects.all().count() == 0:
-        User.objects.create_superuser(username="admin", password="admin")
     execute_from_command_line(sys.argv)
 
 
