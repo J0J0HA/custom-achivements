@@ -2,6 +2,8 @@ version: '3'
 services:
   server:
     build: .
+    networks:
+      - server
     ports:
       - "8055:80"
     volumes:
@@ -10,3 +12,7 @@ services:
       DJANGO_SUPERUSER_USERNAME: admin
       DJANGO_SUPERUSER_PASSWORD: admin
       DJANGO_SUPERUSER_EMAIL: admin@example.com
+
+networks:
+  server:
+    driver: bridge
