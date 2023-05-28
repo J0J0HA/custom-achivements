@@ -19,6 +19,8 @@ def main():
         execute_from_command_line( [ sys.argv[0], "migrate" ] )
         import regenerate
         regenerate.regenerate()
+    if not settings._SUPERUSER_CREATED:
+        execute_from_command_line( [ sys.argv[0], "createsuperuser", "--noinput" ] )
     execute_from_command_line(sys.argv)
 
 
