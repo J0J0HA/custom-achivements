@@ -33,17 +33,22 @@ def reindex(date_backup):
             if not achievement.trigger.is_triggered(user):
                 continue
             print(f"Adding Achievement '{achievement}' to {user}...")
-            obsession = AchievementObsession.objects.create(
-                date=date_backup.get(
+            date = date_backup.get(
                     user.user.username
                     + "$"
                     + achievement.row.name
                     + "$"
                     + str(achievement.level),
-                    0,
-                ),
-                achievement=achievement,
-            )
+                )
+            if date:
+                obsession = AchievementObsession.objects.create(
+                    date=date,
+                    achievement=achievement,
+                )
+            else:
+                obsession = AchievementObsession.objects.create(
+                    achievement=achievement,
+                )
             obsession.save()
             user.achievements.add(obsession)
             user.save()
@@ -63,10 +68,10 @@ def new_row(name):
     return row
 
 
-def new_achievement(row, level, description, trigger):
-    print("Adding Achievement", row, level, description, trigger)
+def new_achievement(row, level, description, phrase, trigger):
+    print("Adding Achievement", row, level, description, phrase, trigger)
     achievement = Achievement.objects.create(
-        row=row, level=level, description=description, trigger=trigger
+        row=row, level=level, description=description, phrase=phrase, trigger=trigger
     )
     achievement.save()
     return achievement
