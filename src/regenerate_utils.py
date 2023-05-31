@@ -13,42 +13,17 @@ def reset():
     Trigger.objects.all().delete()
 
 
-def backup_dates():
-    date_backup = {}
-    for user in UserProfile.objects.all():
-        for achievement in user.achievements.all():
-            date_backup[
-                user.user.username
-                + "$"
-                + achievement.achievement.row.name
-                + "$"
-                + str(achievement.achievement.level)
-            ] = achievement.date
-    return date_backup
-
-
-def reindex(date_backup):
+def reindex():
     for achievement in Achievement.objects.all():
         for user in UserProfile.objects.all():
             if not achievement.trigger.is_triggered(user):
                 continue
             print(f"Adding Achievement '{achievement}' to {user}...")
-            date = date_backup.get(
-                    user.user.username
-                    + "$"
-                    + achievement.row.name
-                    + "$"
-                    + str(achievement.level),
-                )
-            if date:
-                obsession = AchievementObsession.objects.create(
-                    date=date,
-                    achievement=achievement,
-                )
-            else:
-                obsession = AchievementObsession.objects.create(
-                    achievement=achievement,
-                )
+            date = achievement.trigger.get_date(user)
+            obsession = AchievementObsession.objects.create(
+                date=date,
+                achievement=achievement,
+            )
             obsession.save()
             user.achievements.add(obsession)
             user.save()

@@ -9,11 +9,10 @@ def regenerate(urls):
     urls = deque(urls)
 
     def regenerate_():
-        date_backup = rutils.backup_dates()
         rutils.reset()
         while urls:
             regenerate_from_url(urls.pop())
-        rutils.reindex(date_backup)
+        rutils.reindex()
 
     def regenerate_from_url(url):
         print("Getting achievements from: ", url)
