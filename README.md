@@ -6,7 +6,7 @@ Readmes are overrated, at least if you know how the program works.
 
 ## Install
 
-YOu need to clone the repo first.
+You need to clone the repo first.
 
 ### Manual
 
@@ -15,12 +15,12 @@ YOu need to clone the repo first.
 Install:
 
 ```bash
-$ sh setup.sh
+pip install -r requirements.txt
 ```
 
 Run:
 ```bash
-$ sh run.sh
+python src/manage.py runserver 0.0.0.0:8055
 ```
 
 #### Windows
@@ -28,42 +28,33 @@ $ sh run.sh
 Install:
 
 ```bash
-$ setup
+pip install -r requirements.txt
 ```
 
 Run:
 ```bash
-$ run
+python src\manage.py runserver 0.0.0.0:8055
 ```
 
 ### Docker
 
+#### Image
+
 Download with:
 
 ```bash
-$ docker pull jojojux/custom-achievements-server
+docker pull jojojux/custom-achievements-server:latest
 ```
 
 Install with:
 
 ```bash
-$ docker run -d -p 8055:8055 --name achievement-server jojojux/custom-achievements-server
+docker run -d -p 8055:8055 --name achievement-server jojojux/custom-achievements-server
 ```
 
-Stop with:
+#### Compose
 
+Run with:
 ```bash
-$ docker stop achievement-server
-```
-
-Start with:
-
-```bash
-$ docker start achievement-server
-```
-
-Restart with:
-
-```bash
-$ docker achievement-server
+docker compose up
 ```
