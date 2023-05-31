@@ -26,6 +26,7 @@ class Trigger(models.Model):
 class Achievement(models.Model):
     row = models.ForeignKey(AchievementRow, on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
+    phrase = models.CharField(max_length=500)
     level = models.IntegerField(default=1)
     trigger = models.ForeignKey(Trigger, on_delete=models.CASCADE)
 
@@ -36,7 +37,10 @@ class Achievement(models.Model):
 class AchievementObsession(models.Model):
     date = models.DateTimeField(default=timezone.now)
     achievement = models.ForeignKey(Achievement, on_delete=models.CASCADE)
-
+    
+    def get_phrase(self):
+        return self.achievement.phrase.format(username=self.userprofile_set.first().user.username)
+    
     def __str__(self):
         return (
             f"[{self.date}] {self.achievement.row}"

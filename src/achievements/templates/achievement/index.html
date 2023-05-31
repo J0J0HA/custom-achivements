@@ -14,6 +14,7 @@
         <img src="https://picsum.photos/200?{{ achievement.date }}" alt="{{ achievement.achievement }}">
         <h3 class="achievement-title">{{ achievement.achievement }}</h3>
         <p class="achievement-time">{{ achievement.date }}</p>
+        <p class="achievement-phrase">{{ achievement.get_phrase }}</p>
         <p class="achievement-description">{{ achievement.achievement.description }}</p>
         <p class="users-same-achievement">{{ achievement.achievement.achievementobsession_set.count }} user{{ achievement.achievement.achievementobsession_set|pluralize }} got this achievement.</p>
     </li>
