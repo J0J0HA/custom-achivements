@@ -50,20 +50,20 @@ def get_stats(request, username):
     selected_order = achievement_orders.get(requested_order, "date")
     profile = get_object_or_404(UserProfile, user__username=username)
     achievements = profile.achievements.order_by(*selected_order)
-    return achievements
+    return achievements, profile.stats
 
 
 def render_stats(request, username):
-    achievements = get_stats(request, username)
+    achievements, stats = get_stats(request, username)
     return render(
         request,
         "achievement/index.html",
-        {"username": username, "achievements": achievements},
+        {"username": username, "achievements": achievements, "stats": stats},
     )
 
 
 def json_stats(request, username):
-    achievements = get_stats(request, username)
+    achievements, stats = get_stats(request, username)
     return HttpResponse(
         json.dumps(
             {
@@ -78,6 +78,7 @@ def json_stats(request, username):
                     }
                     for achievement in achievements
                 ],
+                "stats": stats
             }
         ),
         content_type="application/json",
