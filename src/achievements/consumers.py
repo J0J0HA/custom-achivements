@@ -1,3 +1,4 @@
+from django.db.models import Q
 import json
 
 from channels.generic.websocket import WebsocketConsumer
@@ -42,7 +43,15 @@ class StatsStreamConsumer(WebsocketConsumer):
             user.stats[stat_name] += 1
             user.save()
 
-        for trigger in Trigger.objects.filter(name=stat_name):
+        components = stat_name.split('.')
+
+        filter_query = Q()
+        for i in range(len(components)):
+            pattern = '.'.join(components[:i+1])
+            print(pattern)
+            filter_query |= Q(name__startswith=pattern)
+
+        for trigger in Trigger.objects.filter(filter_query):
             if not trigger.is_triggered(user):
                 continue
             for achievement in trigger.achievement_set.all():
