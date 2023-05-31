@@ -58,3 +58,25 @@ Run with:
 ```bash
 docker compose up
 ```
+
+Own compose example:
+```bash
+version: '3'
+services:
+  server:
+    image: jojojux/custom-achievements-server:latest
+    networks:
+      - server
+    ports:
+      - "8055:80"
+    volumes:
+      - config:/config
+    environment:
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_PASSWORD: admin
+      DJANGO_SUPERUSER_EMAIL: admin@example.com
+
+networks:
+  server:
+    driver: bridge
+```
