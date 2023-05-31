@@ -73,6 +73,7 @@ def json_stats(request, username):
                         "name": achievement.achievement.row.name,
                         "level": achievement.achievement.level,
                         "description": achievement.achievement.description,
+                        "phrase": achievement.get_phrase(),
                         "user_count": achievement.achievement.achievementobsession_set.count(),
                     }
                     for achievement in achievements
