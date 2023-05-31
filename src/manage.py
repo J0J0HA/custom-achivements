@@ -14,12 +14,13 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    if not os.path.exists(settings._DB_PATH):
-        execute_from_command_line( [ sys.argv[0], "makemigrations", "achievements" ] )
-        execute_from_command_line( [ sys.argv[0], "migrate" ] )
-    import regenerate
-    regenerate.ensure_django()
-    regenerate.regenerate(settings._CONFIG.get("achievement-lists", []))
+    if sys.argv[1] == "runserver":
+        if not os.path.exists(settings._DB_PATH):
+            execute_from_command_line( [ sys.argv[0], "makemigrations", "achievements" ] )
+            execute_from_command_line( [ sys.argv[0], "migrate" ] )
+        import regenerate
+        regenerate.ensure_django()
+        regenerate.regenerate(settings._CONFIG.get("achievement-lists", []))
     execute_from_command_line(sys.argv)
 
 
