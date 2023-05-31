@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
+from datetime import datetime
+
 User = get_user_model()
 
 
@@ -17,7 +19,11 @@ class Trigger(models.Model):
     value = models.IntegerField(default=0)
 
     def is_triggered(self, user):
-        return user.stats.get(self.name, 0) >= self.value
+        return len(user.stats.get(self.name, [])) >= self.value
+
+    def get_date(self, user):
+        timestamp = user.stats.get(self.name, [])[self.value - 1].get("timestamp", 0)
+        return datetime.utcfromtimestamp(timestamp / 1000)
 
     def __str__(self):
         return f"{self.name} >= {self.value}"
@@ -37,14 +43,15 @@ class Achievement(models.Model):
 class AchievementObsession(models.Model):
     date = models.DateTimeField(default=timezone.now)
     achievement = models.ForeignKey(Achievement, on_delete=models.CASCADE)
-    
+
     def get_phrase(self):
-        return self.achievement.phrase.format(username=self.userprofile_set.first().user.username)
-    
-    def __str__(self):
-        return (
-            f"[{self.date}] {self.achievement.row}"
+        return self.achievement.phrase.format(
+            username=self.userprofile_set.first().user.username,
+            amount=self.achievement.trigger.value,
         )
+
+    def __str__(self):
+        return f"[{self.date}] {self.achievement.row}"
 
 
 class UserProfile(models.Model):
