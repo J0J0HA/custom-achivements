@@ -1,0 +1,3 @@
+[submodule "wiki"]
+	path = wiki
+	url = https://github.com/J0J0HA/custom-achievements-server.wiki.git
