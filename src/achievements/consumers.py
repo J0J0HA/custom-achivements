@@ -1,52 +1,92 @@
-from django.db.models import Q
 import json
-import datetime
-from channels.generic.websocket import WebsocketConsumer
-from django.contrib.auth import get_user_model
+from django.db.models import Q
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from channels.db import database_sync_to_async
+from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import UserProfile, AchievementObsession, Trigger
+from .settings import PROTOCOL_VERSIONS_COMPATIBLE
 
 
-class StatsStreamConsumer(WebsocketConsumer):
-    def connect(self):
+class StatsStreamConsumer(AsyncWebsocketConsumer):
+    user: None | User
+    profile: None | UserProfile
+    connection_accepted: bool = False
+
+    async def connect(self):
+        print(self.scope["headers_dict"])
+
+        await self.accept()
+
+        if (
+            self.scope["headers_dict"].get("protocol-version")
+            not in PROTOCOL_VERSIONS_COMPATIBLE
+        ):
+            print(self.scope["headers_dict"].get("protocol-version"), PROTOCOL_VERSIONS_COMPATIBLE)
+            await self.close(4101)
+            return
+
+        if "auth-password" not in self.scope["headers_dict"]:
+            await self.close(4201)
+            return
+
         username = self.scope["url_route"]["kwargs"]["username"]
-        self.accept()
+        self.user = await database_sync_to_async(authenticate)(
+            username=username, password=self.scope["headers_dict"].get("auth-password")
+        )
+
+        if self.user is None:
+            await self.close(4202)
+            return
+
+        if self.user.is_anonymous:
+            await self.close(4202)
+            return
 
         try:
-            self.user = UserProfile.objects.get(user__username=username)
+            self.profile = await UserProfile.objects.aget(user__username=username)
         except UserProfile.DoesNotExist:
-            self.send(
+            await self.close(4401)
+            return
+
+
+        self.connection_accepted = True
+        
+        await self.send(
                 text_data=json.dumps(
                     {
-                        "type": "error_report",
-                        "error": "unknown_user",
-                        "description": f"The user {username} is unknown.",
+                        "type": "accept_connection"
                     }
                 )
             )
-            self.disconnect()
 
-        if username == "admin":
-            self.send(json.dumps({"type": "notice_superuser"}))
+        if self.user.is_superuser:
+            await self.send(json.dumps({"type": "notice", "topic": "superuser"}))
+            
+    
+    async def disconnect(self, code):
+        print("Disconnect", code)
+        return code
 
-    def disconnect(self, code):
-        ...
-
-    def user_inecrease_stat(self, stat_name, meta, value):
-        if stat_name not in self.user.stats:
-            self.user.stats[stat_name] = [meta for _ in range(value)]
-            self.user.save()
+    async def user_inecrease_stat(self, stat_name, meta, value):
+        if stat_name not in self.profile.stats:
+            self.profile.stats[stat_name] = [meta for _ in range(value)]
         else:
-            self.user.stats[stat_name] += [meta for _ in range(value)]
-            self.user.save()
+            self.profile.stats[stat_name] += [meta for _ in range(value)]
+        await database_sync_to_async(self.profile.save)()
 
-    def receive(self, text_data):
+    async def receive(self, text_data):
+        print(text_data, self.connection_accepted)
+        if not self.connection_accepted:
+            await self.close(4103)
+        
         stat_data = json.loads(text_data)
         msg_type = stat_data["type"]
         if msg_type != "stats_update":
-            self.send(
+            await self.send(
                 text_data=json.dumps(
                     {
-                        "type": "error_report",
+                        "type": "error",
                         "error": "unknown_type",
                         "description": f"The type {msg_type} is unknown.",
                     }
@@ -57,60 +97,49 @@ class StatsStreamConsumer(WebsocketConsumer):
         value = stat_data["count"]
         meta = stat_data["meta"]
         if "timestamp" not in meta:
-            self.send(
+            await self.send(
                 text_data=json.dumps(
                     {
                         "type": "error_report",
                         "error": "missing_timestamp",
-                        "description": f"The 'timestamp' filed in 'meta' is missing.",
+                        "description": "The 'timestamp' filed in 'meta' is missing.",
                     }
                 )
             )
-            return
 
         filter_query = Q()
         parts = stat_name.split(".")
         for part in range(len(parts)):
             pat = ".".join(parts[: part + 1])
-            self.user_inecrease_stat(pat, meta, value)
+            await self.user_inecrease_stat(pat, meta, value)
             filter_query |= Q(name=pat)
 
-        for trigger in Trigger.objects.filter(filter_query):
-            if not trigger.is_triggered(self.user):
+        async for trigger in Trigger.objects.filter(filter_query):
+            if not trigger.is_triggered(self.profile):
                 continue
-            for achievement in trigger.achievement_set.all():
-                if self.user.has_achievement(achievement):
+            async for achievement in trigger.achievement_set.all():
+                if await database_sync_to_async(self.profile.has_achievement)(
+                    achievement
+                ):
                     continue
-                obsession = AchievementObsession.objects.create(date = trigger.get_date(self.user), achievement=achievement)
-                obsession.save()
-                self.user.achievements.add(obsession)
-                self.user.save()
-                self.send(
+                obsession = await AchievementObsession.objects.acreate(
+                    date=trigger.get_date(self.profile), achievement=achievement
+                )
+                await obsession.asave()
+                await self.profile.achievements.aadd(obsession)
+                await self.profile.asave()
+                await self.send(
                     text_data=json.dumps(
                         {
                             "type": "new_achievement",
-                            "name": achievement.row.name,
+                            "name": (
+                                await database_sync_to_async(
+                                    lambda achievement: achievement.row
+                                )(achievement)
+                            ).name,
                             "level": achievement.level,
                             "description": achievement.description,
                             "image_url": "https://picsum.photos/200",
                         }
                     )
                 )
-        # achievements_changed = Achievement.objects.filter(trigger=stat, trigger_value__lte=user.stats[stat_name])
-        # for achievement in achievements_changed:
-        #     if achievement in [a.achievement for a in user.achievements.all()]:
-        #         continue
-        #     obsession = AchievementObsession.objects.create(achievement=achievement)
-        #     obsession.save()
-        #     user.achievements.add(obsession)
-        #     self.send(
-        #         text_data=json.dumps(
-        #             {
-        #                 "type": "new_achievement",
-        #                 "name": achievement.row.name,
-        #                 "level": achievement.level,
-        #                 "description": achievement.description,
-        #                 "image_url": "https://picsum.photos/200",
-        #             }
-        #         )
-        #     )
