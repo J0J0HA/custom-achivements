@@ -79,7 +79,7 @@ def json_stats(request, username, self):
                     }
                     for achievement in achievements
                 ],
-                "stats": stats
+                "stats": stats,
             }
         ),
         content_type="application/json",
@@ -90,7 +90,10 @@ def index(request):
     if User.objects.all().count() == 0:
         superuser = User.objects.create_superuser(username="admin", password="admin")
         UserProfile.objects.create(user=superuser).save()
-        return HttpResponse("<h1>First user!</h1><p>You can now login as 'admin' with password 'admin'.<br>Please consider to change your password!</p><a href='?'>Reload to start.</a>")
+        return HttpResponse(
+            "<h1>First user!</h1><p>You can now login as 'admin' with password 'admin'.<br>Please consider to change your password!</p><a href='?'>Reload to start.</a>"
+        )
+
     @login_required(login_url="/login")
     def index_handler(request):
         return render_stats(request, request.user.username, True)
