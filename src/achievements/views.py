@@ -45,16 +45,16 @@ achievement_orders = {
 }
 
 
-def get_stats(request, username):
+def get_stats(request, username, self):
     requested_order = request.GET.get("order", "date")
     selected_order = achievement_orders.get(requested_order, "date")
     profile = get_object_or_404(UserProfile, user__username=username)
     achievements = profile.achievements.order_by(*selected_order)
-    return achievements, profile.stats
+    return achievements, {key: len(value) for key, value in profile.stats.items()} if not self else profile.stats
 
 
-def render_stats(request, username):
-    achievements, stats = get_stats(request, username)
+def render_stats(request, username, self):
+    achievements, stats = get_stats(request, username, self)
     return render(
         request,
         "achievement/index.html",
@@ -62,8 +62,9 @@ def render_stats(request, username):
     )
 
 
-def json_stats(request, username):
-    achievements, stats = get_stats(request, username)
+def json_stats(request, username, self):
+    achievements, stats = get_stats(request, username, self)
+            
     return HttpResponse(
         json.dumps(
             {
@@ -95,19 +96,18 @@ def index(request):
 
     @login_required(login_url="/login")
     def index_handler(request):
-        return render_stats(request, request.user.username)
-
+        return render_stats(request, request.user.username, True)
     return index_handler(request)
 
 
 @login_required(login_url="/login")
 def index_api(request):
-    return json_stats(request, request.user.username)
+    return json_stats(request, request.user.username, True)
 
 
 def user(request, username):
-    return render_stats(request, username)
+    return render_stats(request, username, False)
 
 
 def user_api(request, username):
-    return json_stats(request, username)
+    return json_stats(request, username, False)

@@ -59,10 +59,10 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
                     }
                 )
             )
+            self.close(4202)
 
         if self.user.is_superuser:
             await self.send(json.dumps({"type": "notice", "topic": "superuser"}))
-            
     
     async def disconnect(self, code):
         print("Disconnect", code)
