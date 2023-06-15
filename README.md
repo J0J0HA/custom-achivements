@@ -1,7 +1,6 @@
 # custom-achievements-server
 
 [![Docker Image CI](https://github.com/J0J0HA/custom-achievements-server/actions/workflows/docker-image.yml/badge.svg?branch=master)](https://github.com/J0J0HA/custom-achievements-server/actions/workflows/docker-image.yml)
-
 [![CodeQL](https://github.com/J0J0HA/custom-achievements-server/actions/workflows/codeql.yml/badge.svg)](https://github.com/J0J0HA/custom-achievements-server/actions/workflows/codeql.yml)
 
 Readmes are overrated, at least if you know how the program works.
