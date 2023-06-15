@@ -11,6 +11,8 @@ trusted-origins:
 achievement-lists:
   - "https://raw.githubusercontent.com/J0J0HA/custom-achievement-lists/main/all.json"
 
+statistic-names: "https://raw.githubusercontent.com/J0J0HA/custom-achievement-lists/main/statistic-names.json"
+
 settings:
   secret-key: "django-insecure-bkqxrbe=x)uh%g8u__^*o!s7*rs#ouu%80b3825y!kk-67uh8o"
   debug: yes
