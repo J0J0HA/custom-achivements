@@ -14,15 +14,12 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
     connection_accepted: bool = False
 
     async def connect(self):
-        print(self.scope["headers_dict"])
-
         await self.accept()
 
         if (
             self.scope["headers_dict"].get("protocol-version")
             not in PROTOCOL_VERSIONS_COMPATIBLE
         ):
-            print(self.scope["headers_dict"].get("protocol-version"), PROTOCOL_VERSIONS_COMPATIBLE)
             await self.close(4101)
             return
 
@@ -59,7 +56,6 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
                     }
                 )
             )
-            self.close(4202)
 
         if self.user.is_superuser:
             await self.send(json.dumps({"type": "notice", "topic": "superuser"}))
@@ -76,7 +72,6 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
         await database_sync_to_async(self.profile.save)()
 
     async def receive(self, text_data):
-        print(text_data, self.connection_accepted)
         if not self.connection_accepted:
             await self.close(4103)
         
