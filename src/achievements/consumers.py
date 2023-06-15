@@ -23,10 +23,10 @@ class StatsStreamConsumer(WebsocketConsumer):
                     }
                 )
             )
-            self.disconnect()
+            self.close(4202)
 
         if username == "admin":
-            self.send(json.dumps({"type": "notice_superuser"}))
+            self.send(json.dumps({"type": "notice", "topic": "superuser"}))
 
     def disconnect(self, code):
         ...
