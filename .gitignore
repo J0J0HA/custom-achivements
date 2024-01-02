@@ -1,5 +1,5 @@
 .vscode
-config/db.sqlite3
-config/config.yml
-**/migrations
+config
+database
+db
 **/__pycache__

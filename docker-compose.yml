@@ -1,18 +1,38 @@
 version: '3'
 services:
-  server:
-    build: .
+  cas-db:
+    image: postgres:latest
+    restart: unless-stopped
     networks:
-      - server
+      - custom-achievements-server
     ports:
-      - "8055:80"
+      - 5432:5432
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=custom_achievements
+      - POSTGRES_USER=custom_achievements
+      - POSTGRES_PASSWORD=cas2023
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U custom_achievements -d custom_achievements'"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  cas:
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - custom-achievements-server
+    ports:
+      - 8055:80
     volumes:
       - ./config:/config
-    environment:
-      DJANGO_SUPERUSER_USERNAME: admin
-      DJANGO_SUPERUSER_PASSWORD: admin
-      DJANGO_SUPERUSER_EMAIL: admin@example.com
+    depends_on:
+      cas-db:
+        condition: service_healthy
 
 networks:
-  server:
+  custom-achievements-server:
     driver: bridge
