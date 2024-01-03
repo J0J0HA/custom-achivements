@@ -15,7 +15,7 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         await self.accept()
-
+        
         if (
             self.scope["headers_dict"].get("protocol-version")
             not in PROTOCOL_VERSIONS_COMPATIBLE
