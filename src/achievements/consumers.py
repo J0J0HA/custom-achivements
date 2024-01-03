@@ -7,7 +7,10 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Q
 
-from .models import AchievementObsession, StatisticEntry, Trigger, UserProfile
+from .models import AchievementObsession
+from .models import StatisticEntry
+from .models import Trigger
+from .models import UserProfile
 from .settings import PROTOCOL_VERSIONS_COMPATIBLE
 
 
