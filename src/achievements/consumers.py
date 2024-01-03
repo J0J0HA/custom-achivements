@@ -23,10 +23,8 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
 
-        if (
-            self.scope["headers_dict"].get("protocol-version")
-            not in PROTOCOL_VERSIONS_COMPATIBLE
-        ):
+        if (self.scope["headers_dict"].get("protocol-version")
+                not in PROTOCOL_VERSIONS_COMPATIBLE):
             await self.close(4101)
             return
 
@@ -36,8 +34,8 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
 
         username = self.scope["url_route"]["kwargs"]["username"]
         self.user = await database_sync_to_async(authenticate)(
-            username=username, password=self.scope["headers_dict"].get("auth-password")
-        )
+            username=username,
+            password=self.scope["headers_dict"].get("auth-password"))
 
         if self.user is None:
             await self.close(4202)
@@ -48,7 +46,8 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
             return
 
         try:
-            self.profile = await UserProfile.objects.aget(user__username=username)
+            self.profile = await UserProfile.objects.aget(
+                user__username=username)
         except UserProfile.DoesNotExist:
             await self.close(4401)
             return
@@ -58,7 +57,11 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"type": "accept_connection"}))
 
         if self.user.is_superuser:
-            await self.send(json.dumps({"type": "notice", "topic": "superuser"}))
+            await self.send(
+                json.dumps({
+                    "type": "notice",
+                    "topic": "superuser"
+                }))
 
     async def disconnect(self, code):
         print("Disconnect", code)
@@ -81,49 +84,40 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
         stat_data = json.loads(text_data)
         msg_type = stat_data["type"]
         if msg_type != "stats_update":
-            await self.send(
-                text_data=json.dumps(
-                    {
-                        "type": "error",
-                        "error": "unknown_type",
-                        "description": f"The type {msg_type} is unknown.",
-                    }
-                )
-            )
+            await self.send(text_data=json.dumps(
+                {
+                    "type": "error",
+                    "error": "unknown_type",
+                    "description": f"The type {msg_type} is unknown.",
+                }))
             return
         stat_name = stat_data["name"]
         value = stat_data["count"]
         meta = stat_data["meta"]
         if "timestamp" not in meta:
-            await self.send(
-                text_data=json.dumps(
-                    {
-                        "type": "error_report",
-                        "error": "missing_timestamp",
-                        "description": "The 'timestamp' filed in 'meta' is missing.",
-                    }
-                )
-            )
+            await self.send(text_data=json.dumps(
+                {
+                    "type": "error_report",
+                    "error": "missing_timestamp",
+                    "description":
+                    "The 'timestamp' filed in 'meta' is missing.",
+                }))
 
         filter_query = Q()
         parts = stat_name.split(".")
         for part in range(len(parts)):
-            pat = ".".join(parts[: part + 1])
+            pat = ".".join(parts[:part + 1])
             await self.user_increase_stat(pat, meta["timestamp"], value)
             filter_query |= Q(name=pat)
 
         new_achievements = await database_sync_to_async(
-            self.profile.reindex_achievements
-        )(filter_query)
+            self.profile.reindex_achievements)(filter_query)
         for achievement in new_achievements:
             await self.send(
-                text_data=json.dumps(
-                    {
-                        "type": "new_achievement",
-                        "name": achievement.name,
-                        "level": achievement.level,
-                        "description": achievement.description,
-                        "image_url": achievement.image,
-                    }
-                )
-            )
+                text_data=json.dumps({
+                    "type": "new_achievement",
+                    "name": achievement.name,
+                    "level": achievement.level,
+                    "description": achievement.description,
+                    "image_url": achievement.image,
+                }))
