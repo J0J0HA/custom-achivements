@@ -26,5 +26,6 @@ urlpatterns = [
     path(".json", views.index_api),
     path("user/<str:username>.json", views.user_api),
     path("user/<str:username>", views.user),
+    path("regenerate", views.regenerate),
     path("login", auth_views.LoginView.as_view()),
 ]

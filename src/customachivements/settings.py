@@ -8,16 +8,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 _CONFIG_PATH = BASE_DIR / ".." / "config" / "config.yml"
 
-if not os.path.exists(_CONFIG_PATH):
-    shutil.copyfile(BASE_DIR / "assets" / "config" / "config.yml", _CONFIG_PATH)
+# if not os.path.exists(_CONFIG_PATH):
+#     shutil.copyfile(BASE_DIR / "assets" / "config" / "config.yml", _CONFIG_PATH)
 
-with open(_CONFIG_PATH, "r", encoding="ascii") as file:
-    _CONFIG = yaml.load(file, Loader=yaml.Loader)
+if os.path.exists(_CONFIG_PATH):
+    with open(_CONFIG_PATH, "r", encoding="ascii") as file:
+        _CONFIG = yaml.load(file, Loader=yaml.Loader)
+else:
+    _CONFIG = {}
 
 _SETTINGS = _CONFIG.get("settings", {})
 
 _INTERNALS = _CONFIG.get("internals", {})
-_SUPERUSER_CREATED = _INTERNALS.get("superuser-created", True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -96,6 +98,17 @@ if (_DATABASE_TYPE := (_DATABASE := _CONFIG.get("database", {})).get("type", "sq
             "NAME": (_DB_PATH := BASE_DIR / ".." / "config" / _DATABASE.get("file", "db.sqlite3")),
         }
     }
+elif _DATABASE_TYPE == "postgresql":
+    DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": _DATABASE.get("ab", "custom_achievements"),
+        "USER": _DATABASE.get("user", "custom_achievements_system"),
+        "PASSWORD": _DATABASE.get("password", "cas2023"),
+        "HOST": _DATABASE.get("host", "db"),
+        "PORT": _DATABASE.get("port", 5432),
+    }
+}
 else:
     raise NotImplementedError(f"Database of type {_DATABASE_TYPE} is not supported.")
 

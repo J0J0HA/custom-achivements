@@ -1,5 +1,6 @@
-Django
-channels[daphne]
-django-cors-headers
+django==4.2.1
+channels[daphne]==4.0.0
+django-cors-headers==4.0.0
 pyyaml
-requests
+requests==2.31.0
+psycopg2-binary

@@ -1,10 +1,9 @@
 from collections import deque
 import requests
-import time
 
 
 def regenerate(urls):
-    import regenerate_utils as rutils
+    from .import regenerate_utils as rutils
 
     urls = deque(urls)
 
@@ -24,29 +23,25 @@ def regenerate(urls):
             return
         achievements = json.get("achievements", [])
         for achievement in achievements:
-            row = rutils.new_row(achievement.get("name", "Unknown"))
-            for level, level_dat in enumerate(achievement.get("levels", []), start=1):
+            for level, level_dat in enumerate(achievement["levels"], start=1):
                 trigger_dat = level_dat.get("trigger", {})
                 trigger = rutils.new_trigger(
                     trigger_dat.get("name", "achieve.manual_assign"),
                     trigger_dat.get("value", -1),
                 )
+                name = level_dat.get("name", achievement["name"] + " " + str(level))
+                level = level_dat.get("level", level)
+                description = level_dat.get("description", achievement["description"].format(amount=trigger.value))
+                phrase = level_dat.get("phrase", achievement["phrase"])
+                image = level_dat.get("image", achievement["image"])
+                
                 rutils.new_achievement(
-                    row,
-                    level,
-                    level_dat.get(
-                        "description",
-                        achievement.get(
-                            "description", "No description provided."
-                        ).format(amount=trigger_dat.get("value", -1)),
-                    ),
-                    level_dat.get(
-                        "phrase",
-                        achievement.get(
-                            "phrase", "No phrase provided."
-                        ),
-                    ),
-                    trigger,
+                    name=name,
+                    level=level,
+                    description=description,
+                    phrase=phrase,
+                    image=image,
+                    trigger=trigger
                 )
         includes = json.get("include", [])
         for include in includes:

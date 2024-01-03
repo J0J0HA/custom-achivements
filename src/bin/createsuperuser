@@ -1,0 +1,3 @@
+#!/bin/bash
+python manage.py createsuperuser --username $1 --email ""
+python manage.py cas createprofile $1
