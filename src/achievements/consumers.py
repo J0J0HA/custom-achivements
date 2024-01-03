@@ -30,8 +30,7 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
 
         username = self.scope["url_route"]["kwargs"]["username"]
         self.user = await database_sync_to_async(authenticate)(
-            username=username, password=self.scope["headers_dict"].get(
-                "auth-password")
+            username=username, password=self.scope["headers_dict"].get("auth-password")
         )
 
         if self.user is None:
@@ -63,12 +62,10 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
         for _ in range(value):
             stat_entry = await StatisticEntry.objects.acreate(
                 name=stat_name,
-                timestamp=datetime.fromtimestamp(timestamp/1000),
+                timestamp=datetime.fromtimestamp(timestamp / 1000),
             )
             await stat_entry.asave()
-            await self.profile.statistics.aadd(
-                stat_entry
-            )
+            await self.profile.statistics.aadd(stat_entry)
         await self.profile.asave()
 
     async def receive(self, text_data):
@@ -109,7 +106,9 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
             await self.user_increase_stat(pat, meta["timestamp"], value)
             filter_query |= Q(name=pat)
 
-        new_achievements = await database_sync_to_async(self.profile.reindex_achievements)(filter_query)
+        new_achievements = await database_sync_to_async(
+            self.profile.reindex_achievements
+        )(filter_query)
         for achievement in new_achievements:
             await self.send(
                 text_data=json.dumps(
