@@ -2,6 +2,8 @@
 **/.dockerignore
 **/.env
 **/.git
+**/.gitkeep
+**/.github
 **/.gitignore
 **/.vs
 **/.vscode

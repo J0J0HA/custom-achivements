@@ -4,9 +4,9 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import UserProfile, AchievementObsession, Trigger
+from .models import UserProfile, AchievementObsession, Trigger, StatisticEntry
 from .settings import PROTOCOL_VERSIONS_COMPATIBLE
-
+from datetime import datetime
 
 class StatsStreamConsumer(AsyncWebsocketConsumer):
     user: None | User
@@ -46,35 +46,33 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
             await self.close(4401)
             return
 
-
         self.connection_accepted = True
-        
-        await self.send(
-                text_data=json.dumps(
-                    {
-                        "type": "accept_connection"
-                    }
-                )
-            )
+
+        await self.send(text_data=json.dumps({"type": "accept_connection"}))
 
         if self.user.is_superuser:
             await self.send(json.dumps({"type": "notice", "topic": "superuser"}))
-    
+
     async def disconnect(self, code):
         print("Disconnect", code)
         return code
 
-    async def user_inecrease_stat(self, stat_name, meta, value):
-        if stat_name not in self.profile.stats:
-            self.profile.stats[stat_name] = [meta for _ in range(value)]
-        else:
-            self.profile.stats[stat_name] += [meta for _ in range(value)]
-        await database_sync_to_async(self.profile.save)()
+    async def user_increase_stat(self, stat_name, timestamp, value):
+        for _ in range(value):
+            stat_entry = await StatisticEntry.objects.acreate(
+                name = stat_name,
+                timestamp = datetime.fromtimestamp(timestamp/1000),
+            )
+            await stat_entry.asave()
+            await self.profile.statistics.aadd(
+                stat_entry
+            )
+        await self.profile.asave()
 
     async def receive(self, text_data):
         if not self.connection_accepted:
             await self.close(4103)
-        
+
         stat_data = json.loads(text_data)
         msg_type = stat_data["type"]
         if msg_type != "stats_update":
@@ -106,35 +104,19 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
         parts = stat_name.split(".")
         for part in range(len(parts)):
             pat = ".".join(parts[: part + 1])
-            await self.user_inecrease_stat(pat, meta, value)
+            await self.user_increase_stat(pat, meta["timestamp"], value)
             filter_query |= Q(name=pat)
 
-        async for trigger in Trigger.objects.filter(filter_query):
-            if not trigger.is_triggered(self.profile):
-                continue
-            async for achievement in trigger.achievement_set.all():
-                if await database_sync_to_async(self.profile.has_achievement)(
-                    achievement
-                ):
-                    continue
-                obsession = await AchievementObsession.objects.acreate(
-                    date=trigger.get_date(self.profile), achievement=achievement
+        new_achievements = await database_sync_to_async(self.profile.reindex_achievements)(filter_query)
+        for achievement in new_achievements:
+            await self.send(
+                text_data=json.dumps(
+                    {
+                        "type": "new_achievement",
+                        "name": achievement.name,
+                        "level": achievement.level,
+                        "description": achievement.description,
+                        "image_url": achievement.image,
+                    }
                 )
-                await obsession.asave()
-                await self.profile.achievements.aadd(obsession)
-                await self.profile.asave()
-                await self.send(
-                    text_data=json.dumps(
-                        {
-                            "type": "new_achievement",
-                            "name": (
-                                await database_sync_to_async(
-                                    lambda achievement: achievement.row
-                                )(achievement)
-                            ).name,
-                            "level": achievement.level,
-                            "description": achievement.description,
-                            "image_url": "https://picsum.photos/200",
-                        }
-                    )
-                )
+            )

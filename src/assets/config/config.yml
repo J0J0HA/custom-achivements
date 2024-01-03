@@ -1,26 +1,45 @@
+#hostnames you page can be reached from
+
 allowed-hosts:
   - "localhost"
   - "127.0.0.1"
 #  - "some-fancy-domain.com"
 
+
+# origins that are allowed to load your pages content
 trusted-origins:
   - "http://localhost"
   - "http://127.0.0.1"
 #  - "https://some-fancy-domain.com"
 
+
+# which achievements to load
 achievement-lists:
   - "https://raw.githubusercontent.com/J0J0HA/custom-achievement-lists/main/all.json"
 
+# Not yet implemented
 statistic-names: "https://raw.githubusercontent.com/J0J0HA/custom-achievement-lists/main/statistic-names.json"
 
 settings:
   secret-key: "django-insecure-bkqxrbe=x)uh%g8u__^*o!s7*rs#ouu%80b3825y!kk-67uh8o"
-  debug: yes
+  debug: yes  # only for development
   proxy-ssl: no
 
+# You can choose if you want to use postgres or sqlite
+
+# > Settings for postresql
 database:
-  type: sqlite3
-  file: db.sqlite3
+  type: postgresql
+  db: custom_achievements
+  user: custom_achievements
+  password: cas2023
+  host: cas-db  # host (db when using our docker-compose)
+  port: 5432  # this is the default port
+
+# > settings for sqlite
+# database:
+#   type: sqlite3
+#   file: db.sqlite3  # path under ./config
 
 internals:
   version: 1
