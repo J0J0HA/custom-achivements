@@ -12,6 +12,7 @@ from .settings import PROTOCOL_VERSIONS_COMPATIBLE
 
 
 class StatsStreamConsumer(AsyncWebsocketConsumer):
+    """ """
     user: None | User
     profile: None | UserProfile
     connection_accepted: bool = False
