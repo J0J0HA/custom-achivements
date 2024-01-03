@@ -8,6 +8,7 @@ from .models import UserProfile, AchievementObsession, Trigger, StatisticEntry
 from .settings import PROTOCOL_VERSIONS_COMPATIBLE
 from datetime import datetime
 
+
 class StatsStreamConsumer(AsyncWebsocketConsumer):
     user: None | User
     profile: None | UserProfile
@@ -15,7 +16,7 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         await self.accept()
-        
+
         if (
             self.scope["headers_dict"].get("protocol-version")
             not in PROTOCOL_VERSIONS_COMPATIBLE
@@ -29,7 +30,8 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
 
         username = self.scope["url_route"]["kwargs"]["username"]
         self.user = await database_sync_to_async(authenticate)(
-            username=username, password=self.scope["headers_dict"].get("auth-password")
+            username=username, password=self.scope["headers_dict"].get(
+                "auth-password")
         )
 
         if self.user is None:
@@ -60,8 +62,8 @@ class StatsStreamConsumer(AsyncWebsocketConsumer):
     async def user_increase_stat(self, stat_name, timestamp, value):
         for _ in range(value):
             stat_entry = await StatisticEntry.objects.acreate(
-                name = stat_name,
-                timestamp = datetime.fromtimestamp(timestamp/1000),
+                name=stat_name,
+                timestamp=datetime.fromtimestamp(timestamp/1000),
             )
             await stat_entry.asave()
             await self.profile.statistics.aadd(
