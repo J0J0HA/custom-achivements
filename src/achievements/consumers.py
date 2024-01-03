@@ -1,12 +1,14 @@
 import json
-from django.db.models import Q
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
+from datetime import datetime
+
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import UserProfile, AchievementObsession, Trigger, StatisticEntry
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from django.db.models import Q
+
+from .models import AchievementObsession, StatisticEntry, Trigger, UserProfile
 from .settings import PROTOCOL_VERSIONS_COMPATIBLE
-from datetime import datetime
 
 
 class StatsStreamConsumer(AsyncWebsocketConsumer):
