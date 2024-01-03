@@ -2,7 +2,7 @@ import yaml
 from pathlib import Path
 
 
-PROTOCOL_VERSIONS_COMPATIBLE = ["0.3.0"]
+PROTOCOL_VERSIONS_COMPATIBLE = ["0.3.1"]
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
