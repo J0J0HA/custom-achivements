@@ -1,4 +1,4 @@
-django==4.2.7
+django==4.2.16
 channels[daphne]==4.0.0
 django-cors-headers==4.0.0
 pyyaml
